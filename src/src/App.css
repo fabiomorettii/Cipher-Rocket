@@ -1,0 +1,10 @@
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, rgba(255, 245, 231, 0.75), rgba(237, 245, 245, 0.95)),
+    linear-gradient(135deg, #fbf7f1 0%, #f1f7f5 50%, #f7f3ee 100%);
+  color: var(--slate-900);
+}
