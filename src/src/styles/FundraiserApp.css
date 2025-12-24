@@ -1,0 +1,335 @@
+.fundraiser-app {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.hero {
+  background: linear-gradient(135deg, rgba(28, 124, 84, 0.12), rgba(255, 107, 61, 0.12));
+  border-radius: 24px;
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6), transparent 70%);
+  top: -120px;
+  right: -80px;
+}
+
+.hero-inner {
+  position: relative;
+  max-width: 40rem;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.7rem;
+  color: var(--slate-600);
+  margin-bottom: 0.75rem;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  margin: 0 0 0.75rem;
+}
+
+.hero-copy {
+  margin: 0;
+  color: var(--slate-700);
+  font-size: 1.05rem;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.content-grid.secondary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 22px;
+  padding: 1.75rem;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.campaign-card h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.campaign-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status-pill {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.status-pill.open {
+  background: rgba(28, 124, 84, 0.15);
+  color: var(--accent-green);
+}
+
+.status-pill.closed {
+  background: rgba(17, 24, 39, 0.15);
+  color: var(--slate-700);
+}
+
+.status-pill.neutral {
+  background: rgba(58, 160, 160, 0.12);
+  color: var(--accent-sky);
+}
+
+.campaign-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.label {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  color: var(--slate-500);
+}
+
+.value {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--slate-800);
+}
+
+.monospace {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.progress-track {
+  background: rgba(17, 24, 39, 0.08);
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-orange), var(--accent-green));
+  border-radius: inherit;
+  transition: width 0.5s ease;
+}
+
+.progress-caption {
+  font-size: 0.85rem;
+  color: var(--slate-600);
+}
+
+.fundraiser-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--slate-600);
+  word-break: break-all;
+}
+
+.action-card h3,
+.stats-card h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.action-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.action-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--slate-700);
+}
+
+.action-form input {
+  padding: 0.75rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+  font-family: inherit;
+}
+
+.action-form input:focus {
+  outline: 2px solid rgba(255, 107, 61, 0.35);
+  border-color: rgba(255, 107, 61, 0.5);
+}
+
+.fundraiser-app button {
+  border: none;
+  border-radius: 12px;
+  padding: 0.85rem 1.2rem;
+  background: var(--accent-orange);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fundraiser-app button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.fundraiser-app button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(255, 107, 61, 0.2);
+}
+
+.fundraiser-app .end-button {
+  background: var(--slate-800);
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: var(--slate-600);
+  margin: 0;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.decrypted-box {
+  background: rgba(28, 124, 84, 0.08);
+  border-radius: 16px;
+  padding: 1rem;
+  font-size: 0.95rem;
+}
+
+.card-state {
+  text-align: left;
+  color: var(--slate-600);
+}
+
+.card-state-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  color: var(--slate-800);
+}
+
+.card-state-copy {
+  margin: 0;
+}
+
+.status-banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+.status {
+  margin: 0;
+  color: var(--accent-green);
+  font-weight: 600;
+}
+
+.error {
+  margin: 0;
+  color: #b42318;
+  font-weight: 600;
+}
+
+.reveal {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.reveal.delay-1 {
+  animation-delay: 0.1s;
+}
+
+.reveal.delay-2 {
+  animation-delay: 0.2s;
+}
+
+.reveal.delay-3 {
+  animation-delay: 0.3s;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 960px) {
+  .content-grid,
+  .content-grid.secondary {
+    grid-template-columns: 1fr;
+  }
+
+  .campaign-grid,
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 2rem 1.5rem;
+  }
+
+  .fundraiser-app {
+    padding: 2rem 1rem 3rem;
+  }
+
+  .campaign-name-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
