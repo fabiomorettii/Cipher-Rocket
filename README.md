@@ -1,110 +1,212 @@
-# FHEVM Hardhat Template
+# Cipher Rocket
 
-A Hardhat-based template for developing Fully Homomorphic Encryption (FHE) enabled Solidity smart contracts using the
-FHEVM protocol by Zama.
+Cipher Rocket is a single-campaign, privacy-preserving fundraising dApp built on Zama FHEVM. It lets a fundraiser
+create one campaign with a target and deadline, accept ETH contributions, and track encrypted contributor balances
+and rewards without exposing individual contribution amounts inside contract state. The fundraiser can end the
+campaign at any time and withdraw all raised ETH.
 
-## Quick Start
+## Project summary
 
-For detailed instructions see:
-[FHEVM Hardhat Quick Start Tutorial](https://docs.zama.ai/protocol/solidity-guides/getting-started/quick-start-tutorial)
+- Purpose: confidential fundraising with encrypted contribution tracking and encrypted reward points.
+- Scope: a single active campaign per deployment.
+- Networks: designed for Sepolia (Zama FHEVM) deployments.
+- Privacy model: encrypted per-user stats and encrypted totals in contract state; ETH transfers remain public on-chain.
 
-### Prerequisites
+## Problem this project solves
 
-- **Node.js**: Version 20 or higher
-- **npm or yarn/pnpm**: Package manager
+Traditional fundraisers expose individual contribution amounts and balances on-chain. This discourages participation
+when donors want confidentiality while still expecting transparent settlement and clear rewards. Cipher Rocket
+separates value transfer (public ETH) from accounting and rewards (encrypted), enabling:
 
-### Installation
+- Private contribution accounting and points.
+- Transparent settlement and progress with a public ETH total.
+- Clear, deterministic rewards without revealing contributor amounts in contract state.
 
-1. **Install dependencies**
+## Advantages
 
-   ```bash
-   npm install
-   ```
+- Confidential accounting: per-user and total contributions are stored as encrypted FHE values.
+- Deterministic rewards: 1 ETH contributes 1,000,000 encrypted points, computed on-chain.
+- On-chain settlement: ETH is held in the contract and forwarded to the fundraiser on campaign end.
+- Minimal trust: encryption and access control are enforced by the Zama FHEVM runtime.
+- Simple UX: contributors can decrypt their own stats; the fundraiser can decrypt totals.
 
-2. **Set up environment variables**
+## Core features
 
-   ```bash
-   npx hardhat vars set MNEMONIC
+- Create a campaign with name, target amount, and end timestamp.
+- Contribute ETH while logging encrypted contribution and encrypted points.
+- Encrypted, per-user contribution balance and points ledger.
+- Encrypted total contributions and points for the fundraiser.
+- Campaign end and withdrawal by the fundraiser at any time.
+- Public progress tracking using the clear total raised.
 
-   # Set your Infura API key for network access
-   npx hardhat vars set INFURA_API_KEY
+## How it works
 
-   # Optional: Set Etherscan API key for contract verification
-   npx hardhat vars set ETHERSCAN_API_KEY
-   ```
+1. The fundraiser creates a single campaign on-chain.
+2. Contributors send ETH and an encrypted amount handle; the contract updates encrypted balances and points.
+3. The contract tracks:
+   - `totalRaised` in clear ETH for progress and settlement.
+   - `_encryptedContributions` per address (encrypted).
+   - `_encryptedPoints` per address (encrypted).
+   - `_encryptedTotalRaised` and `_encryptedTotalPoints` (encrypted).
+4. Contributors decrypt their own stats via the Zama relayer SDK and EIP-712 signatures.
+5. The fundraiser can end the campaign and withdraw all ETH.
 
-3. **Compile and test**
+## Technology stack
 
-   ```bash
-   npm run compile
-   npm run test
-   ```
+- Smart contracts: Solidity 0.8.27, Zama FHEVM libraries.
+- Dev framework: Hardhat + hardhat-deploy + TypeChain.
+- Encryption: Zama FHEVM, relayer SDK for client-side encryption/decryption.
+- Frontend: React + Vite.
+- Wallet UX: RainbowKit + wagmi.
+- Read calls: viem.
+- Write calls: ethers v6.
 
-4. **Deploy to local network**
-
-   ```bash
-   # Start a local FHEVM-ready node
-   npx hardhat node
-   # Deploy to local network
-   npx hardhat deploy --network localhost
-   ```
-
-5. **Deploy to Sepolia Testnet**
-
-   ```bash
-   # Deploy to Sepolia
-   npx hardhat deploy --network sepolia
-   # Verify contract on Etherscan
-   npx hardhat verify --network sepolia <CONTRACT_ADDRESS>
-   ```
-
-6. **Test on Sepolia Testnet**
-
-   ```bash
-   # Once deployed, you can run a simple test on Sepolia.
-   npx hardhat test --network sepolia
-   ```
-
-## 📁 Project Structure
+## Repository structure
 
 ```
-fhevm-hardhat-template/
-├── contracts/           # Smart contract source files
-│   └── FHECounter.sol   # Example FHE counter contract
-├── deploy/              # Deployment scripts
-├── tasks/               # Hardhat custom tasks
-├── test/                # Test files
-├── hardhat.config.ts    # Hardhat configuration
-└── package.json         # Dependencies and scripts
+contracts/              Smart contracts (ConfidentialFundraiser is the core)
+deploy/                 Hardhat deployment scripts
+tasks/                  Custom Hardhat tasks for campaign actions
+test/                   Contract tests (local FHEVM mock)
+src/                    Frontend (React + Vite project)
 ```
 
-## 📜 Available Scripts
+## Smart contract details
 
-| Script             | Description              |
-| ------------------ | ------------------------ |
-| `npm run compile`  | Compile all contracts    |
-| `npm run test`     | Run all tests            |
-| `npm run coverage` | Generate coverage report |
-| `npm run lint`     | Run linting checks       |
-| `npm run clean`    | Clean build artifacts    |
+Contract: `contracts/ConfidentialFundraiser.sol`
 
-## 📚 Documentation
+- Single campaign only: `createCampaign` can be called once.
+- Config validation: name required, target > 0, endTimestamp must be in the future.
+- Contribution flow:
+  - ETH is transferred in the transaction.
+  - Encrypted amount is added to contributor balance and encrypted totals.
+  - Encrypted points are computed as `amount / 1_000_000_000_000`.
+  - 1 ETH (1e18 wei) => 1,000,000 points.
+- Permissions:
+  - Contributors can decrypt their own encrypted contribution and points.
+  - The fundraiser can decrypt the encrypted totals.
+- Events:
+  - `CampaignCreated`
+  - `ContributionReceived`
+  - `CampaignEnded`
 
-- [FHEVM Documentation](https://docs.zama.ai/fhevm)
-- [FHEVM Hardhat Setup Guide](https://docs.zama.ai/protocol/solidity-guides/getting-started/setup)
-- [FHEVM Testing Guide](https://docs.zama.ai/protocol/solidity-guides/development-guide/hardhat/write_test)
-- [FHEVM Hardhat Plugin](https://docs.zama.ai/protocol/solidity-guides/development-guide/hardhat)
+Public vs encrypted data:
 
-## 📄 License
+- Public: campaign configuration, fundraiser address, `totalRaised`.
+- Encrypted: per-user contributions, per-user points, total encrypted raised, total encrypted points.
+- Note: ETH amounts are still visible in transaction value; the encrypted ledger protects contract state balances.
 
-This project is licensed under the BSD-3-Clause-Clear License. See the [LICENSE](LICENSE) file for details.
+## Frontend behavior
 
-## 🆘 Support
+- Uses viem for read-only contract calls.
+- Uses ethers for write transactions.
+- Uses Zama relayer SDK for encryption and decryption.
+- No local storage usage for sensitive state.
+- No frontend environment variables; configuration is stored in source files.
 
-- **GitHub Issues**: [Report bugs or request features](https://github.com/zama-ai/fhevm/issues)
-- **Documentation**: [FHEVM Docs](https://docs.zama.ai)
-- **Community**: [Zama Discord](https://discord.gg/zama)
+Key frontend files:
 
----
+- `src/src/components/FundraiserApp.tsx` UI and user flows.
+- `src/src/config/contracts.ts` contract address and ABI.
+- `src/src/config/wagmi.ts` WalletConnect project ID and chain config.
+- `src/src/hooks/useZamaInstance.ts` Zama relayer SDK initialization.
 
-**Built with ❤️ by the Zama team**
+## Setup prerequisites
+
+- Node.js 20+
+- npm
+- WalletConnect Project ID (for RainbowKit)
+- Sepolia ETH and a funded deployer account
+- Root `.env` file for deployment only:
+  - `INFURA_API_KEY`
+  - `PRIVATE_KEY`
+  - Optional: `ETHERSCAN_API_KEY`
+
+Note: The deployer uses `PRIVATE_KEY` only. Mnemonics are intentionally not supported.
+
+## Install dependencies
+
+Root (contracts, tests, deployments):
+
+```bash
+npm install
+```
+
+Frontend:
+
+```bash
+cd src
+npm install
+```
+
+## Test the contracts
+
+```bash
+npm run compile
+npm run test
+```
+
+The test suite uses the local FHEVM mock and is not intended for Sepolia.
+
+## Deploy to Sepolia
+
+1. Ensure `.env` contains `INFURA_API_KEY` and `PRIVATE_KEY`.
+2. Run tests and tasks locally first.
+3. Deploy:
+
+```bash
+npx hardhat deploy --network sepolia
+```
+
+## Update frontend contract configuration
+
+After deploying to Sepolia:
+
+1. Copy the deployed address into `src/src/config/contracts.ts`.
+2. Copy the ABI generated by Hardhat from `deployments/sepolia/ConfidentialFundraiser.json`.
+3. Paste the ABI array into `src/src/config/contracts.ts` as `CONTRACT_ABI`.
+4. Update the WalletConnect project ID in `src/src/config/wagmi.ts`.
+
+No JSON imports are used in the frontend; the ABI is embedded as a TypeScript array.
+
+## Run the frontend
+
+```bash
+cd src
+npm run dev
+```
+
+Connect your wallet to Sepolia and use the UI to create a campaign, contribute, and decrypt stats.
+
+## Hardhat task examples
+
+```bash
+npx hardhat task:address --network sepolia
+npx hardhat task:campaign-info --network sepolia
+npx hardhat task:create-campaign --name "Rocket Launch" --target "5" --end "1712345678" --network sepolia
+npx hardhat task:contribute --value "0.25" --network sepolia
+npx hardhat task:decrypt-contribution --network sepolia
+npx hardhat task:decrypt-points --network sepolia
+```
+
+## Operational notes and constraints
+
+- Only one campaign can exist per contract deployment.
+- The fundraiser may end the campaign at any time; there is no on-chain enforcement of reaching the target.
+- Encrypted balances rely on Zama FHEVM permissions; only authorized users can decrypt.
+- The clear `totalRaised` is the authoritative settlement balance used for withdrawal.
+- Frontend does not use environment variables or local storage for contract configuration.
+
+## Future roadmap
+
+- Multi-campaign support with per-campaign encrypted ledgers.
+- Milestone-based releases and optional escrow.
+- Contribution caps and whitelist windows (without exposing balances).
+- Off-chain notifications and analytics dashboards.
+- Indexer integration for faster UI updates.
+- Multi-chain deployments as additional FHEVM networks are supported.
+- Governance controls for campaign owners (pause, extend, or revise targets).
+
+## License
+
+BSD-3-Clause-Clear. See `LICENSE` for details.
